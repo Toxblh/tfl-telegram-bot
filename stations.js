@@ -28,6 +28,24 @@ const STATIONS = [
       command: 'tcw',
       stopPoint: '940GZZLUCYF',
       platforms: ['Eastbound - Platform 2']
+    },
+    {
+      name: 'Stratford central line',
+      command: 'stc',
+      stopPoint: '940GZZLUSTD',
+      platforms: ['Eastbound - Platform 6', 'Westbound - Platform 3']
+    },
+    {
+      name: 'Stratford dlr',
+      command: 'std',
+      stopPoint: '940GZZDLSTD',
+      platforms: ['4a', '4b']
+    },
+    {
+      name: 'Leytonstone',
+      command: 'ley',
+      stopPoint: '940GZZLULYS',
+      platforms: ['Eastbound - Platform 3', 'Westbound - Platform 1', 'Westbound - Platform 2']
     }
   ]
 
