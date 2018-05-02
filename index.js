@@ -36,3 +36,8 @@ STATIONS.map(station => {
       })
   })
 })
+
+bot.onText(/\/help/, msg => {
+  const userId = msg.chat.id
+  bot.sendMessage(userId, STATIONS.map(station => `/${station.command} - ${station.name}`).join('\n'))
+})
