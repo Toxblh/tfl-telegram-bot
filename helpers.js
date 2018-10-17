@@ -24,8 +24,13 @@ function getNameStation(value) {
   return value.replace(' DLR Station', '')
 }
 
+function getPlatformNumber(value) {
+  return value.replace('Platform ', '')
+}
+
 module.exports = {
   toHHMMSS,
   sortByTime,
-  getNameStation
+  getNameStation,
+  getPlatformNumber
 }

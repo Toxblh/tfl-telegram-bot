@@ -2,7 +2,7 @@ const axios = require('axios')
 const R = require('ramda')
 const dayjs = require('dayjs')
 const TelegramBot = require('node-telegram-bot-api')
-const { toHHMMSS, sortByTime, getNameStation } = require('./helpers')
+const { toHHMMSS, sortByTime, getNameStation, getPlatformNumber } = require('./helpers')
 
 const STATIONS = require('./stations')
 const { TOKEN } = require('./token')
@@ -12,7 +12,7 @@ const bot = new TelegramBot(TOKEN, options)
 
 STATIONS.map(station => {
   bot.onText(new RegExp(`/${station.command}`), msg => {
-    const userId = msg.chat.id
+    const chatId = msg.chat.id
 
     axios
       .get(`https://api.tfl.gov.uk/StopPoint/${station.stopPoint}/arrivals`)
@@ -23,21 +23,22 @@ STATIONS.map(station => {
         dd.map(item => {
           if (R.any(R.equals(item.platformName))(station.platforms)) {
             const expectedArrival = dayjs(item.expectedArrival)
+            const timeToArrival = dayjs() > expectedArrival ? '0:00' : expectedArrival.diff(dayjs(), 'seconds')
 
-            output += item.platformName + '\n'
-            output += getNameStation(item.destinationName)
-            output += ' (' + toHHMMSS(expectedArrival.diff(dayjs(), 'seconds')) + ')'
-            output += ' ' + expectedArrival.format('HH:mm:ss')
-            output += '\n\n'
+            output += '```\n'
+            output += getPlatformNumber(item.platformName)
+            output += ' | ' + toHHMMSS(timeToArrival)
+            output += ' | ' + getNameStation(item.destinationName)
+            output += '\n```'
           }
         })
 
-        bot.sendMessage(userId, output)
+        bot.sendMessage(chatId, output, { parse_mode: 'Markdown' })
       })
   })
 })
 
 bot.onText(/\/help/, msg => {
-  const userId = msg.chat.id
-  bot.sendMessage(userId, STATIONS.map(station => `/${station.command} - ${station.name}`).join('\n'))
+  const chatId = msg.chat.id
+  bot.sendMessage(chatId, STATIONS.map(station => `/${station.command} - ${station.name}`).join('\n'))
 })
