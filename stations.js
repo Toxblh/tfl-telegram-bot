@@ -46,6 +46,12 @@ const STATIONS = [
       command: 'ley',
       stopPoint: '940GZZLULYS',
       platforms: ['Eastbound - Platform 3', 'Westbound - Platform 1', 'Westbound - Platform 2']
+    },
+    {
+      name: 'Westferry',
+      command: 'wfr',
+      stopPoint: '940GZZDLWFE',
+      platforms: ['Platform 1']
     }
   ]
 
