@@ -1,56 +1,79 @@
 const axios = require("axios");
 const R = require("ramda");
 const dayjs = require("dayjs");
-const {
-  toHHMMSS,
-  sortByTime,
-  getNameStation,
-  getPlatformNumber
-} = require("./helpers");
-
-// 930GCAW Canary Wharf Pier
-// 930GWRF Royal Wharf Pier
+const readline = require("readline");
+const { toHHMMSS, sortByTime, getNameStation } = require("./helpers");
+const chalk = require("chalk");
 
 const stations = [
   {
     stopPoint: "930GCAW",
     name: "Canary Wharf Pier",
-    destination: ["Woolwich Pier"]
+    direction: ["outbound"],
+    timeToStation: 4.5 * 60, // 4:30
+    info: []
   },
-//   {
-//     stopPoint: "930GWRF",
-//     name: "Royal Wharf Pier",
-//     destination: ["Westminster"]
-//   }
+  {
+    stopPoint: "930GWRF",
+    name: "Royal Wharf Pier",
+    direction: ["inbound"],
+    timeToStation: 9 * 60, // 9:00
+    info: []
+  }
 ];
 
-stations.forEach(station => {
-  axios
-    .get(`https://api.tfl.gov.uk/StopPoint/${station.stopPoint}/arrivals`)
-    .then(({ data }) => {
-      const dd = sortByTime(data);
-      let output = `\n## ${station.name}`;
+function updateData() {
+  stations.forEach((station, index) => {
+    axios
+      .get(`https://api.tfl.gov.uk/StopPoint/${station.stopPoint}/arrivals`)
+      .then(({ data }) => {
+        const dd = sortByTime(data);
 
-      dd.map(item => {
-        if (R.any(R.equals(item.destinationName))(station.destination)) {
-          const expectedArrival = dayjs(item.expectedArrival);
-          const timeToArrival =
-            dayjs() > expectedArrival
-              ? "0:00"
-              : expectedArrival.diff(dayjs(), "seconds");
-
-          output += "\n";
-          output += item.lineName;
-          output += " | " + dayjs(item.timestamp).format('HH:mm:ss');;
-          output += " | " + dayjs(item.timeToLivedayjs).format('HH:mm:ss');;
-          output += " | " + dayjs(item.expectedArrival).format('HH:mm:ss');;
-          output += " | " + item.direction;
-          output += " | " + toHHMMSS(item.timeToStation);
-          output += " | " + toHHMMSS(timeToArrival);
-          output += " | " + getNameStation(item.destinationName);
-        }
+        stations[index].info = dd;
       });
+  });
+}
 
-      console.log(output);
+function printInfo() {
+  const blank = "\n".repeat(process.stdout.rows);
+  console.log(blank);
+  readline.clearScreenDown(process.stdout);
+  readline.cursorTo(process.stdout, 0, 0);
+
+  stations.forEach(station => {
+    console.log(`\n## ${station.name}`);
+
+    station.info.map(item => {
+      if (R.any(R.equals(item.direction))(station.direction)) {
+        const expectedArrival = dayjs(item.expectedArrival);
+        let color;
+        let liveTimeToArrival = expectedArrival.diff(dayjs(), "seconds");
+        const timeToArrival =
+          dayjs() > expectedArrival ? "0:00" : liveTimeToArrival;
+
+        liveTimeToArrival <= station.timeToStation && (color = chalk.red);
+        liveTimeToArrival > station.timeToStation && (color = chalk.yellow);
+        liveTimeToArrival > station.timeToStation + 180 &&
+          (color = chalk.green);
+
+        let output = item.lineName;
+        // output += " | " + item.direction;
+        output += " | " + dayjs(item.expectedArrival).format("HH:mm:ss");
+        output += " -> " + dayjs(item.timeToLive).format("HH:mm:ss");
+        output += " | " + toHHMMSS(item.timeToStation);
+        output += " | " + color(toHHMMSS(timeToArrival));
+        output += " | " + getNameStation(item.destinationName);
+        // output += " | " + dayjs().format("HH:mm:ss");
+        output += " | " + toHHMMSS(dayjs().diff(item.timestamp, "seconds"));
+        console.log(output);
+      }
     });
-});
+  });
+}
+
+const blank = "\n".repeat(process.stdout.rows);
+console.log(blank);
+readline.clearScreenDown(process.stdout);
+
+setInterval(updateData, 5000);
+setInterval(printInfo, 1000);

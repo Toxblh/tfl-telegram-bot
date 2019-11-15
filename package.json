@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.19.0",
+    "chalk": "^3.0.0",
     "dayjs": "^1.8.17",
     "node-telegram-bot-api": "^0.40.0",
     "ramda": "^0.26.1"
