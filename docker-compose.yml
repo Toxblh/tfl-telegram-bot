@@ -1,0 +1,6 @@
+version: "3"
+services:
+  app:
+    container_name: tfl-bot
+    restart: always
+    build: .

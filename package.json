@@ -5,7 +5,8 @@
   "main": "index.js",
   "repository": "https://github.com/Toxblh/tfl-telegram-bot.git",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,8 +17,5 @@
     "node-telegram-bot-api": "^0.40.0",
     "ramda": "^0.26.1"
   },
-  "devDependencies": {
-    "shipit-cli": "^5.1.0",
-    "shipit-deploy": "^5.1.0"
-  }
+  "devDependencies": {}
 }
