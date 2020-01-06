@@ -69,7 +69,7 @@ PIERS.map(station => {
             const timeToArrival =
               dayjs() > expectedArrival ? "0:00" : liveTimeToArrival;
 
-            liveTimeToArrival <= station.timeToStation && (md = "~");
+            liveTimeToArrival <= station.timeToStation && (md = "*");
             liveTimeToArrival > station.timeToStation && (md = "_");
             liveTimeToArrival > station.timeToStation + 180 && (md = "");
 
