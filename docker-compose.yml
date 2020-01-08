@@ -4,3 +4,5 @@ services:
     container_name: tfl-bot
     restart: always
     build: .
+    log_opt:
+      max-size: 10m
